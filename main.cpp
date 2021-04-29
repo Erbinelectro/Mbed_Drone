@@ -37,7 +37,7 @@ void setOffset() {
             O_Acce[cnt] += Acce[cnt];
             O_Magn[cnt] += Magn[cnt];
         }
-        wait_us(100);
+        wait_us(50);
     }
     for (int cnt = 0; cnt < 3; cnt++) {
         O_Jyro[cnt] /= 100;
@@ -94,16 +94,17 @@ int main() {
         attitude.getAttitude(&myQ);
 
         //draw for unity
-        pc.printf("x%d\r\ny%d\r\nz%d\r\nw%d\r\n", (int)(myQ.x*1000000), (int)(myQ.y*1000000), (int)(myQ.z*1000000), (int)(myQ.w*1000000)); //for unity
+        //pc.printf("x%d\r\ny%d\r\nz%d\r\nw%d\r\n", (int)(myQ.x*1000000), (int)(myQ.y*1000000), (int)(myQ.z*1000000), (int)(myQ.w*1000000)); //for unity
 
 
         //Debug
         //pc.printf("imu:: %f %f %f\r\n", imu[1][0], imu[1][1], imu[1][2]);
-        //pc.printf("gyro:: %f %f %f\r\n", gyroLPF[0], gyroLPF[1], gyroLPF[2]);
-        //pc.printf("acce:: %f %f %f\r\n", accLPF[0], accLPF[1], accLPF[2]);
+        pc.printf("gyro:: %f %f %f\r\n", gyroLPF[0], gyroLPF[1], gyroLPF[2]);
+        pc.printf("acce:: %f %f %f\r\n", accLPF[0], accLPF[1], accLPF[2]);
         //pc.printf("magn:: %f %f %f\r\n", mag[0], magLPF[1], magLPF[2]);
         //pc.printf("%f,%f,%f,%f\r\n\n", attitude.q1, attitude.q2, attitude.q3, attitude.q0);
+        pc.printf("\r\n");
 
-        wait_us(100);
+        wait_us(50);
     }
 }
