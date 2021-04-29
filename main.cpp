@@ -16,7 +16,7 @@ const double ACC_LPF_COEF = 0.9;
 const double GYRO_LPF_COEF = 0.8;
 const double MAG_LPF_COEF = 0.9;
 
-//ƒIƒtƒZƒbƒgæ“¾•Ï”
+//ï¿½Iï¿½tï¿½Zï¿½bï¿½gï¿½æ“¾ï¿½Ïï¿½
 float O_Jyro[3], O_Acce[3], O_Magn[3];
 double Jyro[3] = { 0, 0, 0 };
 double Acce[3] = { 0, 0, 0 };
@@ -67,12 +67,12 @@ int main() {
     double gyroLPF[3] = { 0 };
     double magLPF[3] = { 0 };
 
-    //‰Šúİ’è
+    //ï¿½ï¿½ï¿½ï¿½ï¿½İ’ï¿½
     nine.setAccLPF(_460HZ);
     nine.setGyro(_1000DPS);
     nine.setAcc(_16G);
 
-    //ƒIƒtƒZƒbƒgæ“¾
+    //ï¿½Iï¿½tï¿½Zï¿½bï¿½gï¿½æ“¾
     while (count < 100) {
         ++count;
         nine.getGyro(Jyro);
@@ -92,16 +92,16 @@ int main() {
         O_Magn[cnt] /= 100;
     }
 
-    //ƒIƒtƒZƒbƒgİ’è
+    //ï¿½Iï¿½tï¿½Zï¿½bï¿½gï¿½İ’ï¿½
     nine.setOffset(O_Jyro[0], O_Jyro[1], O_Jyro[2],
         O_Acce[0], O_Acce[1], O_Acce[2],
         O_Magn[0], O_Magn[1], O_Magn[2]);
 
-    //madgwick filter timer ƒXƒ^[ƒg
+    //madgwick filter timer ï¿½Xï¿½^ï¿½[ï¿½g
     MadgwickFilter attitude(0.05);
 
     while (1) {
-        //Šp‘¬“x‚Æ‰Á‘¬“xC¥‘©–§“xƒf[ƒ^‚Ìæ“¾
+        //ï¿½pï¿½ï¿½ï¿½xï¿½Æ‰ï¿½ï¿½ï¿½ï¿½xï¿½Cï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½xï¿½fï¿½[ï¿½^ï¿½Ìæ“¾
         nine.getGyroAcc(imu[1]);
         nine.getMag(mag[1]);
         for (int i = 0; i < 3; i++) {
@@ -116,16 +116,16 @@ int main() {
             gyroLPF[i] *= DEG_TO_RAD;
         }
 
-        //XV
+        //ï¿½Xï¿½V
         attitude.MadgwickAHRSupdate(gyroLPF[0], gyroLPF[1], gyroLPF[2], accLPF[0], accLPF[1], accLPF[2], magLPF[0], magLPF[1], magLPF[2]);
         sendFlag = false;
 
-        //p¨æ“¾ with Quaternion
+        //ï¿½pï¿½ï¿½ï¿½æ“¾ with Quaternion
         Quaternion myQ;
         attitude.getAttitude(&myQ);
 
-        //•`‰æ for unity 
-        //pc.printf("x%d\r\ny%d\r\nz%d\r\nw%d\r\n", (int)(myQ.x*1000000), (int)(myQ.y*1000000), (int)(myQ.z*1000000), (int)(myQ.w*1000000)); //for unity
+        //ï¿½`ï¿½ï¿½ for unity 
+        pc.printf("x%d\r\ny%d\r\nz%d\r\nw%d\r\n", (int)(myQ.x*1000000), (int)(myQ.y*1000000), (int)(myQ.z*1000000), (int)(myQ.w*1000000)); //for unity
 
 
         //Debug
@@ -133,7 +133,7 @@ int main() {
         //pc.printf("gyro:: %f %f %f\r\n", gyroLPF[0], gyroLPF[1], gyroLPF[2]);
         //pc.printf("acce:: %f %f %f\r\n", accLPF[0], accLPF[1], accLPF[2]);
         //pc.printf("magn:: %f %f %f\r\n", mag[0], magLPF[1], magLPF[2]);
-        pc.printf("%f,%f,%f,%f\r\n\n", attitude.q1, attitude.q2, attitude.q3, attitude.q0);
+        //pc.printf("%f,%f,%f,%f\r\n\n", attitude.q1, attitude.q2, attitude.q3, attitude.q0);
 
         wait_us(100);
     }
