@@ -16,7 +16,7 @@ const double ACC_LPF_COEF = 0.9;
 const double GYRO_LPF_COEF = 0.8;
 const double MAG_LPF_COEF = 0.9;
 
-//�I�t�Z�b�g�擾�ϐ�
+//varialbe to get offset
 float O_Jyro[3], O_Acce[3], O_Magn[3];
 double Jyro[3] = { 0, 0, 0 };
 double Acce[3] = { 0, 0, 0 };
@@ -24,55 +24,8 @@ double Magn[3] = { 0, 0, 0 };
 int count;
 uint8_t stuck;
 
-void OffsetReload(bool enable) {
-    if (enable && stuck < 50) {
-        ++stuck;
-    }
-    if (enable && stuck >= 50) {
-        stuck = 0;
-        count = 0;
-
-        while (count < 50)
-        {
-            ++count;
-            nine.getGyro(Jyro);
-            nine.getAcc(Acce);
-            nine.getMag(Magn);
-
-            for (int cnt = 0; cnt < 3; cnt++) {
-                O_Jyro[cnt] += Jyro[cnt];
-                O_Acce[cnt] += Acce[cnt];
-                O_Magn[cnt] += Magn[cnt];
-            }
-            wait_us(100);
-        }
-        for (int cnt = 0; cnt < 3; cnt++) {
-            O_Jyro[cnt] /= 50;
-            O_Acce[cnt] /= 50;
-            O_Magn[cnt] /= 50;
-        }
-
-        nine.setOffset(O_Jyro[0], O_Jyro[1], O_Jyro[2],
-            O_Acce[0], O_Acce[1], O_Acce[2],
-            O_Magn[0], O_Magn[1], O_Magn[2]);
-
-    }
-}
-
-int main() {
-
-    double imu[2][6] = { 0 };
-    double mag[2][3] = { 0 };
-    double accLPF[3] = { 0 };
-    double gyroLPF[3] = { 0 };
-    double magLPF[3] = { 0 };
-
-    //�����ݒ�
-    nine.setAccLPF(_460HZ);
-    nine.setGyro(_1000DPS);
-    nine.setAcc(_16G);
-
-    //�I�t�Z�b�g�擾
+void setOffset() {
+     //get offset
     while (count < 100) {
         ++count;
         nine.getGyro(Jyro);
@@ -92,16 +45,32 @@ int main() {
         O_Magn[cnt] /= 100;
     }
 
-    //�I�t�Z�b�g�ݒ�
+    //set offset
     nine.setOffset(O_Jyro[0], O_Jyro[1], O_Jyro[2],
         O_Acce[0], O_Acce[1], O_Acce[2],
         O_Magn[0], O_Magn[1], O_Magn[2]);
+}
 
-    //madgwick filter timer �X�^�[�g
+int main() {
+
+    double imu[2][6] = { 0 };
+    double mag[2][3] = { 0 };
+    double accLPF[3] = { 0 };
+    double gyroLPF[3] = { 0 };
+    double magLPF[3] = { 0 };
+
+    //initial setting
+    nine.setAccLPF(_460HZ);
+    nine.setGyro(_1000DPS);
+    nine.setAcc(_16G);
+
+   setOffset();
+
+    //madgwick filter timer start
     MadgwickFilter attitude(0.05);
 
     while (1) {
-        //�p���x�Ɖ����x�C�������x�f�[�^�̎擾
+        //get angle speed, acceralator, magnetic flux density
         nine.getGyroAcc(imu[1]);
         nine.getMag(mag[1]);
         for (int i = 0; i < 3; i++) {
@@ -116,15 +85,15 @@ int main() {
             gyroLPF[i] *= DEG_TO_RAD;
         }
 
-        //�X�V
+        //reload
         attitude.MadgwickAHRSupdate(gyroLPF[0], gyroLPF[1], gyroLPF[2], accLPF[0], accLPF[1], accLPF[2], magLPF[0], magLPF[1], magLPF[2]);
         sendFlag = false;
 
-        //�p���擾 with Quaternion
+        //get attitude with Quaternion
         Quaternion myQ;
         attitude.getAttitude(&myQ);
 
-        //�`�� for unity 
+        //draw for unity
         pc.printf("x%d\r\ny%d\r\nz%d\r\nw%d\r\n", (int)(myQ.x*1000000), (int)(myQ.y*1000000), (int)(myQ.z*1000000), (int)(myQ.w*1000000)); //for unity
 
 
