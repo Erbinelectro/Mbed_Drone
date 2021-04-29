@@ -64,7 +64,7 @@ int main() {
     nine.setGyro(_1000DPS);
     nine.setAcc(_16G);
 
-   setOffset();
+    setOffset();
 
     //madgwick filter timer start
     MadgwickFilter attitude(0.05);
