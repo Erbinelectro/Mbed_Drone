@@ -67,6 +67,10 @@ int main() {
     double gyroLPF[3] = { 0 };
     double magLPF[3] = { 0 };
 
+    double oldaccLPF[3] = { 0 };
+    double oldgyroLPF[3] = { 0 };
+    double oldmagLPF[3] = { 0 };
+
     //初期設定
     nine.setAccLPF(_460HZ);
     nine.setGyro(_1000DPS);
@@ -99,6 +103,7 @@ int main() {
 
     //madgwick filter timer スタート
     MadgwickFilter attitude(0.05);
+    Quaternion myQ;
 
     while (1) {
         //角速度と加速度，磁束密度データの取得
@@ -121,8 +126,13 @@ int main() {
         sendFlag = false;
 
         //姿勢取得 with Quaternion
-        Quaternion myQ;
         attitude.getAttitude(&myQ);
+
+        for (int i = 0; i < 3; i++) {
+            oldgyroLPF[i] = gyroLPF[i];
+            oldaccLPF[i] = accLPF[i];
+            oldmgLPF[i] = magLPF[i];
+        }
 
         //描画 for unity 
         //pc.printf("x%d\r\ny%d\r\nz%d\r\nw%d\r\n", (int)(myQ.x*1000000), (int)(myQ.y*1000000), (int)(myQ.z*1000000), (int)(myQ.w*1000000)); //for unity
